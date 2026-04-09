@@ -1,0 +1,563 @@
+/* ===== SECCIÓN 6 — Modificación manual de rutas ===== */
+
+/* ── Header ──────────────────────────────────────────────── */
+.mod-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.mod-header h1 { margin: 0; font-size: 1.35rem; }
+.mod-subtitulo {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: var(--texto-sub, #6b7280);
+}
+.mod-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.progreso-badge {
+  background: var(--fondo-alt, #f1f5f9);
+  border: 1px solid var(--borde, #e2e8f0);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texto-sub, #64748b);
+  white-space: nowrap;
+}
+.progreso-badge.completo {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+/* ── Resumen de fuentes ──────────────────────────────────── */
+.resumen-fuentes {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.fuente-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: var(--fondo-alt, #f8fafc);
+  border: 1px solid var(--borde, #e2e8f0);
+  color: var(--texto, #1e293b);
+}
+.tag-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.tag-dot.verde { background: #22c55e; }
+.tag-dot.azul  { background: #3b82f6; }
+.separador-v {
+  width: 1px;
+  height: 24px;
+  background: var(--borde, #e2e8f0);
+}
+
+/* ── OSRM status ─────────────────────────────────────────── */
+.osrm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--texto-sub, #64748b);
+}
+.osrm-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.osrm-dot.pendiente { background: #f59e0b; }
+.osrm-dot.calculando {
+  background: #3b82f6;
+  animation: pulse 1s infinite;
+}
+.osrm-dot.completo { background: #22c55e; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.btn-osrm {
+  background: #1e40af;
+  color: #fff;
+  padding: 5px 12px;
+}
+.btn-osrm:hover:not(:disabled) { background: #1e3a8a; }
+.btn-osrm:disabled { opacity: 0.5; }
+
+/* ── Banner OSRM batch ───────────────────────────────────── */
+.banner-osrm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 0.82rem;
+  color: #1e40af;
+}
+.osrm-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #bfdbfe;
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 100px;
+}
+.osrm-progress-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+.btn-cancel-osrm {
+  background: transparent;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+}
+.btn-cancel-osrm:hover { background: #dbeafe; }
+
+/* ── OSRM ruta individual ────────────────────────────────── */
+.osrm-ruta-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #eff6ff;
+  border-bottom: 1px solid #bfdbfe;
+  font-size: 0.78rem;
+  color: #1e40af;
+}
+.spinner-sm {
+  width: 14px; height: 14px;
+  border: 2px solid #bfdbfe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Botones ─────────────────────────────────────────────── */
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+
+.btn-guardar { background: var(--primario, #2563eb); color: #fff; }
+.btn-guardar:hover:not(:disabled) { background: #1d4ed8; }
+
+.btn-confirmar { background: #16a34a; color: #fff; flex: 1; }
+.btn-confirmar:hover:not(:disabled) { background: #15803d; }
+.btn-confirmar.confirmada { background: #86efac; color: #166534; cursor: default; }
+
+.btn-recalcular {
+  background: var(--fondo-alt, #f1f5f9);
+  color: var(--texto, #1e293b);
+  border: 1px solid var(--borde, #e2e8f0);
+}
+.btn-recalcular:hover:not(:disabled) { background: #e2e8f0; }
+
+.btn-agregar { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+.btn-agregar:hover { background: #bfdbfe; }
+
+/* ── Banner de carga ─────────────────────────────────────── */
+.banner-cargando {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: #1e40af;
+}
+.spinner {
+  width: 20px; height: 20px;
+  border: 3px solid #bfdbfe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Filtro por día ──────────────────────────────────────── */
+.filtro-dias {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.filtro-dia-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--borde, #e2e8f0);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--texto-sub, #64748b);
+}
+.filtro-dia-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+.filtro-dia-btn.activo {
+  background: var(--primario, #2563eb);
+  color: #fff;
+  border-color: var(--primario, #2563eb);
+}
+.filtro-dia-btn .cnt { font-weight: 400; font-size: 0.7rem; opacity: 0.8; }
+
+/* ── Navegador de rutas ──────────────────────────────────── */
+.nav-rutas {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--borde, #e2e8f0);
+}
+.nav-ruta-btn {
+  position: relative;
+  border: 2px solid var(--borde, #e2e8f0);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 120px;
+  text-align: left;
+}
+.nav-ruta-btn:hover { border-color: #93c5fd; background: #f8fafc; }
+.nav-ruta-btn.activo {
+  border-color: var(--primario, #2563eb);
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+.nav-ruta-btn.confirmada { border-color: #86efac; background: #f0fdf4; }
+.nav-ruta-btn.confirmada::after {
+  content: "✓"; position: absolute; top: 4px; right: 6px;
+  font-size: 0.7rem; color: #16a34a; font-weight: 700;
+}
+.nav-ruta-nombre { font-size: 0.78rem; font-weight: 700; color: var(--texto, #1e293b); margin-bottom: 2px; }
+.nav-ruta-dia { font-size: 0.68rem; color: var(--texto-sub, #64748b); text-transform: capitalize; }
+.nav-ruta-info { font-size: 0.68rem; color: var(--texto-sub, #94a3b8); margin-top: 2px; }
+.nav-ruta-tipo {
+  display: inline-block; font-size: 0.6rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 1px 5px; border-radius: 3px; margin-top: 3px;
+}
+.nav-ruta-tipo.tipo-autorizada { background: #dcfce7; color: #166534; }
+.nav-ruta-tipo.tipo-subruta    { background: #dbeafe; color: #1e40af; }
+
+/* OSRM indicator on nav buttons */
+.nav-ruta-osrm {
+  font-size: 0.6rem;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.nav-ruta-osrm .mini-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.mini-dot.osrm-ok  { background: #22c55e; }
+.mini-dot.osrm-pending { background: #f59e0b; }
+.mini-dot.osrm-fail { background: #ef4444; }
+
+/* ── Panel principal ─────────────────────────────────────── */
+.panel-principal {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 16px;
+  min-height: 520px;
+}
+@media (max-width: 900px) {
+  .panel-principal { grid-template-columns: 1fr; min-height: auto; }
+}
+
+/* ── Panel izquierdo ─────────────────────────────────────── */
+.panel-izq {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  border: 1px solid var(--borde, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  max-height: 75vh;
+  overflow: hidden;
+}
+.panel-izq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--borde, #e2e8f0);
+}
+.titulo-ruta { font-size: 1.05rem; margin: 0; color: var(--texto, #1e293b); }
+.meta-ruta {
+  font-size: 0.75rem; color: var(--texto-sub, #64748b);
+  margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap;
+}
+.meta-item { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ── Tipo badge ──────────────────────────────────────────── */
+.tipo-badge-wrap { padding: 6px 18px; border-bottom: 1px solid var(--borde, #e2e8f0); }
+.tipo-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 3px 10px; border-radius: 4px;
+}
+.tipo-badge.autorizada { background: #dcfce7; color: #166534; }
+.tipo-badge.subruta    { background: #dbeafe; color: #1e40af; }
+
+/* ── Resumen de tiempos ──────────────────────────────────── */
+.resumen-tiempos {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--borde, #e2e8f0);
+  border-bottom: 1px solid var(--borde, #e2e8f0);
+}
+.tiempo-celda { background: #fff; padding: 10px 8px; text-align: center; }
+.tiempo-celda .t-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--texto-sub, #94a3b8); margin-bottom: 3px;
+}
+.tiempo-celda .t-valor { font-size: 0.88rem; font-weight: 700; color: var(--texto, #1e293b); }
+
+/* ── Indicadores ─────────────────────────────────────────── */
+#zona-indicadores { flex-shrink: 0; }
+.cap-bar-wrap { padding: 10px 18px; border-bottom: 1px solid var(--borde, #e2e8f0); }
+.cap-bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem; color: var(--texto-sub, #64748b); margin-bottom: 4px;
+}
+.cap-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.cap-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+.cap-bar-fill.verde   { background: #22c55e; }
+.cap-bar-fill.naranja { background: #f59e0b; }
+.cap-bar-fill.rojo    { background: #ef4444; }
+
+.hora-regreso {
+  padding: 8px 18px; font-size: 0.8rem;
+  border-bottom: 1px solid var(--borde, #e2e8f0);
+  display: flex; align-items: center; gap: 8px;
+}
+.badge-hora { font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; }
+.badge-hora.ok    { background: #dcfce7; color: #166534; }
+.badge-hora.tarde { background: #fee2e2; color: #991b1b; }
+
+/* ── Origen del tiempo (OSRM badge) ─────────────────────── */
+.origen-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.68rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+  margin-left: auto;
+}
+.origen-badge.osrm      { background: #dcfce7; color: #166534; }
+.origen-badge.haversine  { background: #fef3c7; color: #92400e; }
+.origen-badge.pendiente  { background: #f1f5f9; color: #64748b; }
+
+/* ── Lista de sucursales ─────────────────────────────────── */
+.lista-sucursales { flex: 1; overflow-y: auto; padding: 8px; }
+.suc-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; margin-bottom: 4px;
+  background: #f8fafc; border: 1px solid transparent;
+  border-radius: 8px; cursor: grab;
+  transition: all 0.15s ease; user-select: none;
+}
+.suc-item:hover { background: #eff6ff; border-color: #bfdbfe; }
+.suc-item.dragging { opacity: 0.5; background: #dbeafe; border-color: #60a5fa; transform: scale(0.97); }
+.suc-item.drag-over { border-top: 3px solid #2563eb; }
+.suc-orden {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--primario, #2563eb); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+}
+.suc-grip { color: #cbd5e1; font-size: 1rem; flex-shrink: 0; cursor: grab; }
+.suc-info { flex: 1; min-width: 0; }
+.suc-nombre {
+  font-size: 0.82rem; font-weight: 600; color: var(--texto, #1e293b);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.suc-detalle { font-size: 0.7rem; color: var(--texto-sub, #94a3b8); margin-top: 1px; }
+.suc-quitar {
+  background: none; border: none; color: #ef4444;
+  cursor: pointer; font-size: 1.1rem; padding: 2px 4px;
+  border-radius: 4px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0;
+}
+.suc-item:hover .suc-quitar { opacity: 1; }
+.suc-quitar:hover { background: #fee2e2; }
+
+.lista-sucursales-vacia {
+  text-align: center; padding: 30px 16px;
+  color: var(--texto-sub, #94a3b8); font-size: 0.82rem;
+}
+
+/* ── Acciones de ruta ────────────────────────────────────── */
+.acciones-ruta {
+  display: flex; gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--borde, #e2e8f0);
+  background: #fafbfc; border-radius: 0 0 10px 10px;
+}
+
+/* ── Panel derecho: mapa ─────────────────────────────────── */
+.panel-der {
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  border: 1px solid var(--borde, #e2e8f0); min-height: 400px;
+}
+.mapa { width: 100%; height: 100%; min-height: 400px; background: #e8ecf0; }
+
+/* ── Modal ────────────────────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: #fff; border-radius: 12px;
+  width: 90%; max-width: 460px; max-height: 80vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; border-bottom: 1px solid var(--borde, #e2e8f0);
+}
+.modal-header h3 { margin: 0; font-size: 1rem; }
+.modal-close {
+  background: none; border: none; font-size: 1.5rem;
+  color: var(--texto-sub, #94a3b8); cursor: pointer; padding: 0 4px;
+}
+.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.input-buscar {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--borde, #e2e8f0); border-radius: 8px;
+  font-size: 0.85rem; margin-bottom: 12px; box-sizing: border-box;
+  outline: none; transition: border-color 0.15s;
+}
+.input-buscar:focus { border-color: #60a5fa; }
+.lista-disponibles { max-height: 350px; overflow-y: auto; }
+.disp-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; border-radius: 6px; cursor: pointer;
+  transition: background 0.1s; font-size: 0.82rem;
+}
+.disp-item:hover { background: #eff6ff; }
+.disp-item .nombre { font-weight: 600; color: var(--texto, #1e293b); }
+.disp-item .num { font-size: 0.72rem; color: var(--texto-sub, #94a3b8); margin-left: 6px; }
+.disp-item .ya-en-ruta { font-size: 0.68rem; color: #f59e0b; font-weight: 600; }
+
+/* ── Estado vacío ────────────────────────────────────────── */
+.estado-vacio { text-align: center; padding: 60px 20px; color: var(--texto-sub, #94a3b8); }
+.estado-vacio .icon { font-size: 2.5rem; margin-bottom: 12px; }
+.estado-vacio p { margin: 4px 0; font-size: 0.9rem; }
+.estado-vacio .sub { font-size: 0.78rem; }
+.estado-vacio code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; }
+
+/* ── Leaflet custom ──────────────────────────────────────── */
+.marker-orden {
+  background: #2563eb; color: #fff; border-radius: 50%;
+  width: 28px; height: 28px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.marker-matriz {
+  background: #dc2626; color: #fff; border-radius: 50%;
+  width: 32px; height: 32px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700;
+  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+/* ══════════════════════════════════════════════════════════════
+   NUEVAS ACCIONES DEL HEADER — Autorizar todas · Guardar · Seguir
+══════════════════════════════════════════════════════════════ */
+
+/* ── Botón "Autorizar todas" ── */
+.btn-autorizar-todas {
+  background: #fff;
+  color: #d97706;
+  border: 1.5px solid #d97706;
+  font-weight: 600;
+  transition: background .15s, transform .1s;
+}
+.btn-autorizar-todas:hover:not(:disabled) {
+  background: #fef3c7;
+}
+.btn-autorizar-todas:active:not(:disabled) { transform: scale(.97); }
+.btn-autorizar-todas:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* ── Botón "Solo guardar" (sin redirección) ── */
+.btn-guardar-sec-mod {
+  background: #fff;
+  color: #16a34a;
+  border: 1.5px solid #16a34a;
+  font-weight: 600;
+  transition: background .15s, transform .1s;
+}
+.btn-guardar-sec-mod:hover:not(:disabled) {
+  background: #dcfce7;
+}
+.btn-guardar-sec-mod:active:not(:disabled) { transform: scale(.97); }
+.btn-guardar-sec-mod:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* ── Toast de notificación ── */
+.mod-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  z-index: 3000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.mod-toast.visible    { opacity: 1; transform: translateY(0); }
+.mod-toast--ok        { background: #16a34a; }
+.mod-toast--error     { background: #dc2626; }
+.mod-toast--info      { background: #2563eb; }

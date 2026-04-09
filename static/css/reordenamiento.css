@@ -1,0 +1,545 @@
+/* ===== SECCIÓN 5 — Reordenamiento de Rutas ===== */
+
+:root {
+  --r-verde:       #16a34a;
+  --r-verde-bg:    #dcfce7;
+  --r-naranja:     #d97706;
+  --r-naranja-bg:  #fef3c7;
+  --r-rojo:        #dc2626;
+  --r-rojo-bg:     #fee2e2;
+  --r-azul:        #2563eb;
+  --r-azul-dark:   #1d4ed8;
+  --r-azul-bg:     #dbeafe;
+  --r-gris-bg:     #f8fafc;
+  --r-borde:       #e2e8f0;
+  --r-texto:       #1e293b;
+  --r-texto-sub:   #64748b;
+}
+
+#reordenamiento-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── Resumen superior ── */
+.reord-resumen {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.res-card {
+  flex: 0 0 auto;
+  min-width: 140px;
+  border-radius: 8px;
+  padding: 14px 20px;
+  text-align: center;
+  border: 1.5px solid var(--r-borde);
+}
+.res-card.pendientes-card {
+  background: var(--r-rojo-bg);
+  border-left: 4px solid var(--r-rojo);
+}
+.res-card.problema-card {
+  background: var(--r-naranja-bg);
+  border-left: 4px solid var(--r-naranja);
+}
+.res-card.resultado-card {
+  background: var(--r-verde-bg);
+  border-left: 4px solid var(--r-verde);
+}
+
+.res-valor {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--r-texto);
+  line-height: 1;
+}
+.pendientes-card .res-valor { color: var(--r-rojo); }
+.problema-card .res-valor   { color: var(--r-naranja); font-size: 1rem; }
+.resultado-card .res-valor  { color: var(--r-verde); }
+
+.res-label {
+  font-size: 0.72rem;
+  color: var(--r-texto-sub);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+.res-acciones {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Botones */
+.btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--r-azul); color: #fff; }
+.btn-primary:hover { background: var(--r-azul-dark); }
+.btn-success { background: var(--r-verde); color: #fff; }
+.btn-success:hover { background: #15803d; }
+.btn-lg { padding: 10px 20px; font-size: 0.95rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-icono { font-size: 1.1rem; }
+
+/* ── Banner de proceso ── */
+.banner-proceso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--r-azul-bg);
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  font-size: 0.83rem;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+/* ── Título de sección ── */
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--r-borde);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--r-texto);
+}
+.seccion-titulo.resultado {
+  border-bottom-color: var(--r-verde);
+  margin-top: 28px;
+}
+.seccion-icono { font-size: 1.1rem; }
+.seccion-sub {
+  font-weight: 400;
+  color: var(--r-texto-sub);
+  font-size: 0.82rem;
+}
+
+/* ── Grid de tarjetas pendientes ── */
+.rutas-grid-reord {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* ── Tarjeta de ruta original (problema) ── */
+.ruta-orig-card {
+  border: 1.5px solid var(--r-rojo);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.orig-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--r-rojo-bg);
+  border-bottom: 1px solid #fca5a5;
+}
+.orig-nombre {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--r-rojo);
+}
+.orig-dia {
+  font-size: 0.7rem;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  background: var(--r-rojo);
+  text-transform: capitalize;
+}
+
+.orig-body { padding: 14px 16px; }
+
+.orig-indicadores {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* Badges reutilizables */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-ok      { background: var(--r-verde-bg); color: var(--r-verde); }
+.badge-warn    { background: var(--r-naranja-bg); color: var(--r-naranja); }
+.badge-fail    { background: var(--r-rojo-bg); color: var(--r-rojo); }
+.badge-info    { background: var(--r-azul-bg); color: var(--r-azul); }
+.badge-neutral { background: #f1f5f9; color: var(--r-texto-sub); }
+
+/* Barra de peso con problema */
+.peso-bar-wrap { margin-bottom: 10px; }
+.peso-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.73rem;
+  color: var(--r-texto-sub);
+  margin-bottom: 4px;
+}
+.peso-bar {
+  height: 10px;
+  background: var(--r-borde);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.peso-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s;
+}
+.peso-bar-fill.ok   { background: var(--r-verde); }
+.peso-bar-fill.warn { background: var(--r-naranja); }
+.peso-bar-fill.fail { background: var(--r-rojo); }
+.peso-bar-limit {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 14px;
+  background: var(--r-texto);
+  border-radius: 1px;
+}
+
+/* Tiempos inline */
+.tiempos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.tiempo-item {
+  background: var(--r-gris-bg);
+  border-radius: 4px;
+  padding: 5px 6px;
+  text-align: center;
+}
+.tiempo-item .ti-label {
+  font-size: 0.62rem;
+  color: var(--r-texto-sub);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tiempo-item .ti-valor {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--r-texto);
+}
+
+/* Lista de sucursales */
+.suc-toggle {
+  background: none;
+  border: none;
+  font-size: 0.73rem;
+  color: var(--r-azul);
+  cursor: pointer;
+  padding: 2px 0;
+  font-weight: 500;
+}
+.suc-toggle:hover { text-decoration: underline; }
+
+.suc-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.suc-list.abierta { max-height: 500px; }
+
+.suc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-top: 1px dashed var(--r-borde);
+  font-size: 0.75rem;
+}
+.suc-orden {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--r-azul);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.suc-nombre { flex: 1; color: var(--r-texto); }
+.suc-peso {
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--r-texto-sub);
+  font-size: 0.73rem;
+}
+
+/* ═══ RESULTADO: grupo de rutas reorganizadas ═══ */
+.resultado-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.resultado-grupo {
+  border: 1.5px solid var(--r-borde);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fafbfc;
+}
+
+.grupo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border-bottom: 1.5px solid var(--r-verde);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.grupo-titulo {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--r-verde);
+}
+.grupo-info {
+  font-size: 0.78rem;
+  color: var(--r-texto-sub);
+}
+
+/* Flecha de transformación */
+.grupo-arrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.78rem;
+  color: var(--r-texto-sub);
+  background: #fff;
+  border-bottom: 1px solid var(--r-borde);
+}
+.arrow-icon {
+  font-size: 1.1rem;
+  color: var(--r-verde);
+}
+.arrow-before {
+  color: var(--r-rojo);
+  font-weight: 600;
+  text-decoration: line-through;
+}
+.arrow-after {
+  color: var(--r-verde);
+  font-weight: 700;
+}
+
+.grupo-subrutas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 14px;
+  padding: 14px;
+}
+
+/* Tarjeta de sub-ruta (resultado) */
+.subruta-card {
+  border: 1.5px solid var(--r-borde);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.15s;
+}
+.subruta-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+
+.subruta-card.color-verde   { border-left: 4px solid var(--r-verde); }
+.subruta-card.color-naranja { border-left: 4px solid var(--r-naranja); }
+.subruta-card.color-rojo    { border-left: 4px solid var(--r-rojo); }
+
+.sub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--r-gris-bg);
+  border-bottom: 1px solid var(--r-borde);
+}
+.sub-nombre {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--r-texto);
+}
+.sub-parte {
+  font-size: 0.68rem;
+  background: var(--r-verde);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.sub-dia {
+  font-size: 0.68rem;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.sub-dia.lunes     { background: #6366f1; }
+.sub-dia.martes    { background: #8b5cf6; }
+.sub-dia.miercoles { background: #0ea5e9; }
+.sub-dia.jueves    { background: #14b8a6; }
+.sub-dia.viernes   { background: #f59e0b; }
+.sub-dia.sabado    { background: #ef4444; }
+.sub-dia.domingo   { background: #78716c; }
+
+.sub-body { padding: 12px 14px; }
+
+.sub-vehiculo {
+  font-size: 0.75rem;
+  color: var(--r-texto-sub);
+  margin-bottom: 8px;
+}
+.sub-vehiculo strong { color: var(--r-texto); }
+
+/* ── Spinner ── */
+.spinner-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  grid-column: 1 / -1;
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--r-borde);
+  border-top-color: var(--r-azul);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.spinner-sm {
+  width: 18px; height: 18px;
+  border: 2px solid #93c5fd;
+  border-top-color: var(--r-azul);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Sin rutas ── */
+.sin-rutas {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--r-texto-sub);
+  grid-column: 1 / -1;
+}
+.sin-rutas .icon { font-size: 2.5rem; margin-bottom: 10px; }
+.sin-rutas p { font-size: 0.88rem; margin: 0; }
+
+/* ── Toast ── */
+.reord-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1e293b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.reord-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reord-toast.ok    { background: var(--r-verde); }
+.reord-toast.error { background: var(--r-rojo); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .rutas-grid-reord { grid-template-columns: 1fr; }
+  .grupo-subrutas { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .reord-resumen { flex-direction: column; }
+  .res-acciones { margin-left: 0; width: 100%; }
+  .res-acciones .btn { flex: 1; justify-content: center; }
+  .tiempos-grid { grid-template-columns: 1fr 1fr; }
+}
+/* ═══ ESTILOS NUEVOS v3 — estrategias de reorganización ═══ */
+
+/* Toast tipo advertencia */
+.reord-toast.warn { background: #d97706; }
+
+/* Badge de advertencia (para "movida al X día") */
+.badge-warn { background: var(--r-naranja-bg); color: var(--r-naranja); }
+
+/* Grupo directa: borde sutil verde */
+.resultado-grupo[style*="border-color:#16a34a22"] {
+  background: #fafffe;
+}
+
+/* Grupo no asignable: borde y fondo rojo */
+.resultado-grupo[style*="border-color:#dc2626"] .grupo-subrutas {
+  display: none;  /* no hay sub-rutas que mostrar */
+}
+
+/* Badge en rango con texto dinámico — ajuste de tamaño */
+.subruta-card .badge.badge-ok,
+.subruta-card .badge.badge-fail {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+}
+/* ── Botón "Solo guardar" (guardado sin redirección) ── */
+.btn-guardar-sec-reord {
+  background: #fff;
+  color: var(--r-verde);
+  border: 1.5px solid var(--r-verde);
+  font-weight: 600;
+}
+.btn-guardar-sec-reord:hover    { background: var(--r-verde-bg); }
+.btn-guardar-sec-reord:active   { transform: scale(.97); }
+.btn-guardar-sec-reord:disabled { opacity: .5; cursor: not-allowed; }

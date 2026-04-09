@@ -1,0 +1,425 @@
+/* ===== SECCIÓN 4 — Validación de Rutas ===== */
+
+:root {
+  --v-verde:       #16a34a;
+  --v-verde-bg:    #dcfce7;
+  --v-verde-borde: #86efac;
+  --v-naranja:     #d97706;
+  --v-naranja-bg:  #fef3c7;
+  --v-naranja-borde: #fcd34d;
+  --v-rojo:        #dc2626;
+  --v-rojo-bg:     #fee2e2;
+  --v-rojo-borde:  #fca5a5;
+  --v-azul:        #2563eb;
+  --v-azul-dark:   #1d4ed8;
+  --v-gris-bg:     #f8fafc;
+  --v-borde:       #e2e8f0;
+  --v-texto:       #1e293b;
+  --v-texto-sub:   #64748b;
+}
+
+#validacion-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── Resumen global ── */
+.val-resumen {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.resumen-card {
+  flex: 0 0 auto;
+  min-width: 120px;
+  border-radius: 8px;
+  padding: 12px 18px;
+  text-align: center;
+  border: 1.5px solid var(--v-borde);
+  background: var(--v-gris-bg);
+}
+.resumen-card.total   { border-left: 4px solid var(--v-azul); }
+.resumen-card.verde   { border-left: 4px solid var(--v-verde); background: var(--v-verde-bg); }
+.resumen-card.naranja { border-left: 4px solid var(--v-naranja); background: var(--v-naranja-bg); }
+.resumen-card.roja    { border-left: 4px solid var(--v-rojo); background: var(--v-rojo-bg); }
+
+.resumen-valor {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--v-texto);
+  line-height: 1;
+}
+.resumen-card.verde   .resumen-valor { color: var(--v-verde); }
+.resumen-card.naranja .resumen-valor { color: var(--v-naranja); }
+.resumen-card.roja    .resumen-valor { color: var(--v-rojo); }
+
+.resumen-label {
+  font-size: 0.72rem;
+  color: var(--v-texto-sub);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+
+.resumen-acciones {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Botones */
+.btn { padding: 7px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.15s; }
+.btn-primary   { background: var(--v-azul); color: #fff; }
+.btn-primary:hover { background: var(--v-azul-dark); }
+.btn-success   { background: var(--v-verde); color: #fff; }
+.btn-success:hover { background: #15803d; }
+
+/* ── Leyenda ── */
+.val-leyenda {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--v-texto);
+  font-weight: 500;
+}
+.leyenda-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.leyenda-dot.verde   { background: var(--v-verde); }
+.leyenda-dot.naranja { background: var(--v-naranja); }
+.leyenda-dot.roja    { background: var(--v-rojo); }
+
+/* ── Tablero de 3 columnas ── */
+.val-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  min-height: 500px;
+}
+
+/* ── Columna ── */
+.val-columna {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--v-borde);
+  border-radius: 10px;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-bottom: 1.5px solid var(--v-borde);
+}
+.col-header.pendientes  { background: #f1f5f9; color: #475569; }
+.col-header.autorizados { background: var(--v-verde-bg); color: var(--v-verde); }
+.col-header.reorganizar { background: var(--v-rojo-bg); color: var(--v-rojo); }
+
+.col-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col-icono { font-size: 1.05rem; }
+
+.col-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.1);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.col-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 80px;
+  transition: background 0.2s;
+}
+
+/* Efecto visual al arrastrar sobre una zona */
+.col-body.dragover {
+  background: #e0f2fe;
+  outline: 2px dashed var(--v-azul);
+  outline-offset: -4px;
+}
+
+/* Placeholder vacío */
+.col-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--v-texto-sub);
+  text-align: center;
+  flex: 1;
+}
+.col-placeholder .ph-icono { font-size: 2rem; margin-bottom: 8px; opacity: 0.5; }
+.col-placeholder p { font-size: 0.82rem; margin: 0; }
+
+/* ── Tarjeta de ruta (draggable) ── */
+.ruta-chip {
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1.5px solid var(--v-borde);
+  cursor: grab;
+  transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  user-select: none;
+  position: relative;
+}
+.ruta-chip:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.10);
+  transform: translateY(-1px);
+}
+.ruta-chip:active { cursor: grabbing; }
+.ruta-chip.dragging {
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+/* Borde de color según estado */
+.ruta-chip.color-verde   { border-left: 4px solid var(--v-verde); }
+.ruta-chip.color-naranja { border-left: 4px solid var(--v-naranja); }
+.ruta-chip.color-rojo    { border-left: 4px solid var(--v-rojo); }
+
+/* Chip header */
+.chip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.chip-nombre {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--v-texto);
+}
+.chip-dia {
+  font-size: 0.68rem;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.chip-dia.lunes     { background: #6366f1; }
+.chip-dia.martes    { background: #8b5cf6; }
+.chip-dia.miercoles { background: #0ea5e9; }
+.chip-dia.jueves    { background: #14b8a6; }
+.chip-dia.viernes   { background: #f59e0b; }
+.chip-dia.sabado    { background: #ef4444; }
+.chip-dia.domingo   { background: #78716c; }
+
+/* Indicadores inline */
+.chip-indicadores {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.chip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip-badge.ok   { background: var(--v-verde-bg); color: var(--v-verde); }
+.chip-badge.warn { background: var(--v-naranja-bg); color: var(--v-naranja); }
+.chip-badge.fail { background: var(--v-rojo-bg); color: var(--v-rojo); }
+.chip-badge.info { background: #dbeafe; color: var(--v-azul); }
+.chip-badge.neutral { background: #f1f5f9; color: var(--v-texto-sub); }
+
+/* Detalles de tiempo */
+.chip-tiempos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.chip-t {
+  background: var(--v-gris-bg);
+  border-radius: 4px;
+  padding: 4px 6px;
+  text-align: center;
+}
+.chip-t .t-label {
+  font-size: 0.62rem;
+  color: var(--v-texto-sub);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.chip-t .t-valor {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--v-texto);
+}
+
+/* Vehículo */
+.chip-vehiculo {
+  font-size: 0.73rem;
+  color: var(--v-texto-sub);
+}
+.chip-vehiculo strong {
+  color: var(--v-texto);
+}
+
+/* Paradas/sucursales toggle */
+.chip-sucursales-toggle {
+  background: none;
+  border: none;
+  font-size: 0.72rem;
+  color: var(--v-azul);
+  cursor: pointer;
+  padding: 2px 0 0;
+  font-weight: 500;
+}
+.chip-sucursales-toggle:hover { text-decoration: underline; }
+
+.chip-sucursales-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.chip-sucursales-list.abierta { max-height: 400px; }
+
+.chip-suc-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  border-top: 1px dashed var(--v-borde);
+  font-size: 0.72rem;
+  color: var(--v-texto);
+}
+.chip-suc-orden {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--v-azul);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.chip-suc-nombre { flex: 1; }
+.chip-suc-peso {
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--v-texto-sub);
+}
+
+/* ── Spinner ── */
+.spinner-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  flex: 1;
+}
+.spinner {
+  width: 30px; height: 30px;
+  border: 3px solid var(--v-borde);
+  border-top-color: var(--v-azul);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Notificación Toast ── */
+.val-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1e293b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.val-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.val-toast.ok { background: var(--v-verde); }
+.val-toast.error { background: var(--v-rojo); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .val-board { grid-template-columns: 1fr; }
+  .col-body { max-height: 40vh; }
+}
+@media (max-width: 600px) {
+  .val-resumen { flex-direction: column; }
+  .resumen-acciones { margin-left: 0; width: 100%; }
+  .resumen-acciones .btn { flex: 1; }
+  .chip-tiempos { grid-template-columns: 1fr 1fr; }
+}
+/* ── Botón "Solo guardar" (guardado sin redirección) ── */
+.btn-guardar-secundario-val {
+  background: #fff;
+  color: var(--v-verde);
+  border: 1.5px solid var(--v-verde);
+  font-weight: 600;
+}
+.btn-guardar-secundario-val:hover    { background: var(--v-verde-bg); }
+.btn-guardar-secundario-val:active   { transform: scale(.97); }
+.btn-guardar-secundario-val:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Lucide icons ── */
+.lucide { width: 1em; height: 1em; vertical-align: -0.15em; flex-shrink: 0; }
+.col-icono .lucide { width: 1.05em; height: 1.05em; vertical-align: -0.15em; }
+.ph-icono .lucide  { width: 2rem;   height: 2rem;   opacity: 0.5; }
+.btn .lucide       { width: 0.85em; height: 0.85em; vertical-align: -0.1em; }
+.chip-badge .lucide { width: 0.8em; height: 0.8em; vertical-align: -0.1em; }
+.chip-nombre .lucide { width: 0.85em; height: 0.85em; vertical-align: -0.1em; }
+.chip-vehiculo .lucide { width: 0.85em; height: 0.85em; vertical-align: -0.1em; }
+.chip-sucursales-toggle .lucide { width: 0.8em; height: 0.8em; vertical-align: -0.1em; }
