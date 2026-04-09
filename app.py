@@ -1,16 +1,17 @@
+import os
 from flask import Flask, redirect, url_for
 from config import Config
 from db import close_db
 
-from router.menu_router          import menu_bp               # renombrado desde logistica_router
-from router.configuracion_router import configuracion_bp
-from router.extraccion_router    import extraccion_bp
+from router.menu_router           import menu_bp
+from router.configuracion_router  import configuracion_bp
+from router.extraccion_router     import extraccion_bp
 from router.creacion_rutas_router import creacion_rutas_bp
-from router.asignacion_router    import asignacion_bp
-from router.validacion_router    import validacion_bp
+from router.asignacion_router     import asignacion_bp
+from router.validacion_router     import validacion_bp
 from router.reordenamiento_router import reordenamiento_bp
-from router.modificacion_router  import modificacion_bp
-from router.pdf_router           import pdf_bp
+from router.modificacion_router   import modificacion_bp
+from router.pdf_router            import pdf_bp
 
 
 def create_app():
@@ -21,7 +22,7 @@ def create_app():
     Config.validar()
 
     # ── Blueprints ─────────────────────────────────────────────────────────
-    app.register_blueprint(menu_bp,           url_prefix="/")          # Menú principal en "/"
+    app.register_blueprint(menu_bp,           url_prefix="/")
     app.register_blueprint(configuracion_bp,  url_prefix="/configuracion")
     app.register_blueprint(extraccion_bp,     url_prefix="/extraccion")
     app.register_blueprint(creacion_rutas_bp, url_prefix="/creacion-rutas")
@@ -37,6 +38,10 @@ def create_app():
     return app
 
 
+# Expuesto a nivel de módulo para que gunicorn pueda encontrarlo:
+#   gunicorn app:app
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=Config.DEBUG)

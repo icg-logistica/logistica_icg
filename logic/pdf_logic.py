@@ -24,8 +24,10 @@ from reportlab.platypus import (
 from db import get_db
 
 # ── Directorio temporal para el PDF generado ─────────────────
-_BASE    = os.path.join(os.path.dirname(__file__), "..")
-TEMP_DIR = os.path.join(_BASE, "static", "temp")
+# Se usa /tmp para compatibilidad con entornos de producción (Render, etc.)
+# donde el sistema de archivos del proyecto puede ser de solo lectura.
+# /tmp siempre es escribible y no necesita crearse.
+TEMP_DIR = "/tmp/icg_pdf"
 
 # ── Medidas de página ─────────────────────────────────────────
 PW, PH             = portrait(LETTER)

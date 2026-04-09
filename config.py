@@ -2,13 +2,15 @@ import os
 
 
 class Config:
-    SECRET_KEY    = os.environ.get("SECRET_KEY", "clave-secreta-dev")
-    DEBUG         = True
+    # En producción esta variable DEBE estar definida como variable de entorno.
+    # El valor de desarrollo es solo un fallback local (nunca usar en Render).
+    SECRET_KEY = os.environ.get("SECRET_KEY", "clave-secreta-dev-local")
+
+    # DEBUG activo solo si la variable de entorno lo indica explícitamente.
+    # En Render nunca se define FLASK_DEBUG, así que queda en False.
+    DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 
     # ── MongoDB ────────────────────────────────────────────────
-    # Carga desde variables de entorno. Si no están definidas,
-    # lanza un error claro al iniciar la app (no un fallo críptico
-    # cuando ya hay requests en vuelo).
     MONGO_URI     = os.getenv("MONGO_URI",     "mongodb://localhost:27017/")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "icg")
 
@@ -20,8 +22,16 @@ class Config:
             faltantes.append("MONGO_URI")
         if not cls.MONGO_DB_NAME:
             faltantes.append("MONGO_DB_NAME")
+        if cls.SECRET_KEY == "clave-secreta-dev-local" and not cls.DEBUG:
+            # En producción la SECRET_KEY genérica es un riesgo de seguridad.
+            import warnings
+            warnings.warn(
+                "SECRET_KEY no está definida como variable de entorno. "
+                "Define una clave segura en Render antes de ir a producción.",
+                stacklevel=2,
+            )
         if faltantes:
             raise RuntimeError(
                 f"Variables de entorno faltantes: {', '.join(faltantes)}. "
-                "Revisa tu archivo .env o entorno del servidor."
+                "Revisa las variables de entorno en Render."
             )
