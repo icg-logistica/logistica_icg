@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Creación de Rutas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/creacion_rutas.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block content %}
+<h1>Creación de Rutas</h1>
+<div id="cr-root">
+
+  <!-- ══════════════ CABECERA ══════════════ -->
+  <header class="cr-header">
+    <div class="cr-header__left">
+    </div>
+    <div class="cr-header__actions">
+      <button class="cr-btn cr-btn--ghost" id="btn-ver-todas">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Ver todas en mapa
+      </button>
+      <button class="cr-btn cr-btn--ghost" id="btn-calcular-todas">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        Calcular todas (OSRM)
+      </button>
+      <button class="cr-btn cr-btn--primary" id="btn-nueva-ruta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva Ruta
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════ LAYOUT PRINCIPAL ══════════════ -->
+  <div class="cr-layout">
+
+    <!-- ── Panel izquierdo: lista de rutas ── -->
+    <aside class="cr-sidebar">
+
+      <!-- Filtros rápidos -->
+      <div class="cr-filter-bar">
+        <div class="cr-search-row">
+          <input class="cr-search" type="text" id="input-buscar-ruta" placeholder="Buscar ruta…">
+          <div class="cr-sort-wrapper">
+            <button class="cr-sort-btn" id="btn-sort-toggle" title="Ordenar rutas">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h6"/></svg>
+            </button>
+            <div class="cr-sort-dropdown" id="sort-dropdown">
+              <button class="cr-sort-option active" data-sort="nombre-asc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                Nombre A–Z
+              </button>
+              <button class="cr-sort-option" data-sort="nombre-desc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                Nombre Z–A
+              </button>
+              <button class="cr-sort-option" data-sort="fecha-desc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Más recientes
+              </button>
+              <button class="cr-sort-option" data-sort="fecha-asc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Más antiguas
+              </button>
+              <button class="cr-sort-option" data-sort="paradas-desc">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Más paradas
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cr-days-filter" id="days-filter">
+          <button class="cr-day-btn active" data-day="todos">Todos</button>
+          <button class="cr-day-btn" data-day="Lunes">L</button>
+          <button class="cr-day-btn" data-day="Martes">M</button>
+          <button class="cr-day-btn" data-day="Miércoles">X</button>
+          <button class="cr-day-btn" data-day="Jueves">J</button>
+          <button class="cr-day-btn" data-day="Viernes">V</button>
+        </div>
+      </div>
+
+      <!-- Indicador de resultados y orden activo -->
+      <div class="cr-list-toolbar" id="list-toolbar">
+        <span class="cr-results-count" id="results-count">0 rutas</span>
+        <span class="cr-sort-active" id="sort-active-label">Nombre A–Z</span>
+      </div>
+
+      <!-- Lista de rutas -->
+      <div class="cr-routes-list" id="lista-rutas">
+        <div class="cr-empty-state" id="empty-rutas">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 12h3m15 0h-3M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>
+          <p>Aún no hay rutas.<br>Crea la primera.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Panel derecho: mapa ── -->
+    <main class="cr-map-wrapper">
+      <div id="mapa-rutas"></div>
+
+      <!-- Overlay info de ruta seleccionada -->
+      <div class="cr-map-info" id="mapa-info" style="display:none">
+        <div class="cr-map-info__header">
+          <span class="cr-map-info__dot" id="info-dot"></span>
+          <strong id="info-nombre"></strong>
+          <button class="cr-map-info__close" id="btn-cerrar-info">✕</button>
+        </div>
+        <div class="cr-map-info__body">
+          <div class="cr-stat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span id="info-tiempo">—</span>
+          </div>
+          <div class="cr-stat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="info-paradas">—</span>
+          </div>
+          <div class="cr-stat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="info-dia">—</span>
+          </div>
+        </div>
+
+        <!-- ── Botón calcular ruta real ── -->
+        <div class="cr-map-info__footer">
+          <button class="cr-btn cr-btn--primary cr-btn--sm" id="btn-calcular-ruta-real" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Calcular ruta real
+          </button>
+          <span class="cr-info-hint" id="info-hint-simple">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Vista simplificada
+          </span>
+        </div>
+      </div>
+
+      <!-- Loader del mapa -->
+      <div class="cr-map-loader" id="mapa-loader" style="display:none">
+        <div class="cr-spinner"></div>
+        <span>Calculando ruta…</span>
+      </div>
+
+      <!-- Panel de progreso para cálculo masivo OSRM -->
+      <div class="cr-batch-progress" id="batch-progress" style="display:none">
+        <div class="cr-batch-progress__header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          <strong>Calculando rutas OSRM</strong>
+          <button class="cr-batch-progress__close" id="btn-cancelar-batch" title="Cancelar">✕</button>
+        </div>
+        <div class="cr-batch-progress__body">
+          <div class="cr-batch-progress__bar-track">
+            <div class="cr-batch-progress__bar-fill" id="batch-bar-fill" style="width:0%"></div>
+          </div>
+          <span class="cr-batch-progress__text" id="batch-text">0 / 0</span>
+          <div class="cr-batch-progress__detail" id="batch-detail"></div>
+        </div>
+        <div class="cr-batch-progress__summary" id="batch-summary" style="display:none">
+          <div class="cr-batch-summary__stats" id="batch-stats"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: CREAR / EDITAR RUTA ══════════════ -->
+<div class="cr-modal-backdrop" id="modal-backdrop" style="display:none">
+  <div class="cr-modal" id="modal-ruta">
+    <div class="cr-modal__header">
+      <h2 id="modal-titulo">Nueva Ruta</h2>
+      <button class="cr-modal__close" id="btn-cerrar-modal">✕</button>
+    </div>
+
+    <div class="cr-modal__body">
+      <!-- Fila superior: nombre + día -->
+      <div class="cr-form-row">
+        <div class="cr-form-group cr-form-group--grow">
+          <label class="cr-label" for="input-nombre-ruta">Nombre de la ruta</label>
+          <input class="cr-input" type="text" id="input-nombre-ruta" placeholder="Ej. Ruta Norte A">
+        </div>
+        <div class="cr-form-group">
+          <label class="cr-label" for="select-dia">Día sugerido</label>
+          <select class="cr-input cr-select" id="select-dia">
+            <option value="">— Seleccionar —</option>
+            <option>Lunes</option>
+            <option>Martes</option>
+            <option>Miércoles</option>
+            <option>Jueves</option>
+            <option>Viernes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dos columnas: disponibles | asignadas -->
+      <div class="cr-form-row cr-form-row--cols">
+        <!-- Sucursales disponibles -->
+        <div class="cr-col">
+          <div class="cr-col__header">
+            <span class="cr-col__label">Sucursales disponibles</span>
+            <span class="cr-badge" id="badge-disponibles">0</span>
+          </div>
+          <input class="cr-input cr-input--sm" type="text" id="input-buscar-suc" placeholder="Buscar sucursal…">
+          <ul class="cr-suc-list" id="lista-disponibles">
+            <li class="cr-suc-list__loading">Cargando sucursales…</li>
+          </ul>
+        </div>
+
+        <!-- Flechas centrales -->
+        <div class="cr-transfer-arrows">
+          <button class="cr-arr-btn" id="btn-agregar-suc" title="Agregar seleccionadas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="cr-arr-btn" id="btn-quitar-suc" title="Quitar seleccionadas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Sucursales en la ruta (ordenables) -->
+        <div class="cr-col">
+          <div class="cr-col__header">
+            <span class="cr-col__label">En esta ruta</span>
+            <span class="cr-badge cr-badge--accent" id="badge-asignadas">0</span>
+          </div>
+          <p class="cr-col__hint">Arrastra para reordenar</p>
+          <ul class="cr-suc-list cr-suc-list--sortable" id="lista-asignadas">
+            <li class="cr-suc-list__empty">Sin sucursales asignadas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cr-modal__footer">
+      <button class="cr-btn cr-btn--ghost" id="btn-cancelar-modal">Cancelar</button>
+      <button class="cr-btn cr-btn--danger" id="btn-eliminar-ruta" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Eliminar ruta
+      </button>
+      <button class="cr-btn cr-btn--primary" id="btn-guardar-ruta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL: CONFIRMAR ELIMINACIÓN ══════════════ -->
+<div class="cr-modal-backdrop" id="modal-confirmar-backdrop" style="display:none">
+  <div class="cr-modal cr-modal--sm">
+    <div class="cr-modal__header">
+      <h2>Confirmar eliminación</h2>
+      <button class="cr-modal__close" id="btn-cerrar-confirmar">✕</button>
+    </div>
+    <div class="cr-modal__body">
+      <p>¿Estás seguro de eliminar la ruta <strong id="confirmar-nombre-ruta"></strong>? Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="cr-modal__footer">
+      <button class="cr-btn cr-btn--ghost" id="btn-cancelar-confirmar">Cancelar</button>
+      <button class="cr-btn cr-btn--danger" id="btn-confirmar-eliminar">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/creacion_rutas.js') }}"></script>
+{% endblock %}

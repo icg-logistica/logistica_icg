@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Reordenamiento de Rutas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reordenamiento.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Reordenamiento de Rutas</h1>
+<div id="reordenamiento-container">
+
+  <!-- Resumen -->
+  <div class="reord-resumen" id="reord-resumen">
+    <div class="res-card pendientes-card">
+      <div class="res-valor" id="res-pendientes">—</div>
+      <div class="res-label">Rutas a reorganizar</div>
+    </div>
+    <div class="res-card problema-card">
+      <div class="res-valor" id="res-problema">—</div>
+      <div class="res-label">Problema principal</div>
+    </div>
+    <div class="res-card resultado-card" id="res-resultado-card" style="display:none;">
+      <div class="res-valor" id="res-generadas">—</div>
+      <div class="res-label">Sub-rutas generadas</div>
+    </div>
+    <div class="res-acciones">
+      <button id="btn-reorganizar" class="btn btn-primary btn-lg">
+        <span class="btn-icono">⚡</span> Reorganizar rutas
+      </button>
+      <button id="btn-guardar-reord"           class="btn btn-guardar-sec-reord" style="display:none;">
+        💾 Solo guardar
+      </button>
+      <button id="btn-guardar-continuar-reord"  class="btn btn-success"           style="display:none;">
+        💾 Guardar y continuar →
+      </button>
+    </div>
+  </div>
+
+  <!-- Banner de proceso -->
+  <div id="banner-proceso" class="banner-proceso" style="display:none;">
+    <div class="spinner-sm"></div>
+    <span>Reorganizando rutas y calculando tiempos con OpenStreetMap…</span>
+  </div>
+
+  <!-- Rutas pendientes de reorganizar (ANTES) -->
+  <div class="seccion-titulo" id="titulo-antes">
+    <span class="seccion-icono">🔴</span>
+    <span>Rutas que no cumplen con la condición de peso</span>
+  </div>
+  <div id="grid-pendientes" class="rutas-grid-reord">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Resultado de reorganización (DESPUÉS) -->
+  <div id="seccion-resultado" style="display:none;">
+    <div class="seccion-titulo resultado">
+      <span class="seccion-icono">🟢</span>
+      <span>Rutas reorganizadas</span>
+      <span class="seccion-sub">— divididas según vehículos disponibles</span>
+    </div>
+    <div id="grid-resultado" class="resultado-container"></div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/reordenamiento.js') }}"></script>
+{% endblock %}

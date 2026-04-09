@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Asignación de Rutas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/asignacion.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1> Asignación de Rutas</h1>
+<div id="asignacion-container">
+
+  <!-- ══════════════════════════════════════════════════════════
+       PANEL DE SELECCIÓN DE RUTAS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="sel-panel" id="sel-panel">
+
+    <div class="sel-panel__header">
+      <div class="sel-panel__title-row">
+        <h2 class="sel-panel__title">
+          <i data-lucide="check-square" class="sel-panel__icon"></i>
+          Selección de rutas
+        </h2>
+        <span class="sel-panel__subtitle">
+          Selecciona las rutas a incluir. Marca como "Entregada" aquellas que ya se completaron.
+        </span>
+      </div>
+      <button class="sel-panel__toggle" id="btn-toggle-sel" aria-expanded="true">
+        Ocultar <i data-lucide="chevron-up"></i>
+      </button>
+    </div>
+
+    <div class="sel-panel__body" id="sel-panel-body">
+
+      <!-- Indicación de uso -->
+      <div class="sel-hint">
+        <i data-lucide="info"></i>
+        <span>
+          <strong>Haz clic en una tarjeta</strong> para marcarla como entregada (ya fue distribuida esa semana).
+          Usa el botón <strong>"Desactivar toda la semana"</strong> en la cabecera de cada día
+          para excluir todas sus rutas del plan de asignación.
+        </span>
+      </div>
+
+      <!-- Controles rápidos -->
+      <div class="sel-controls">
+        <div class="sel-controls__left">
+          <button class="sel-ctrl-btn" id="btn-sel-all"><i data-lucide="check"></i> Incluir todas</button>
+          <button class="sel-ctrl-btn" id="btn-desel-all"><i data-lucide="x"></i> Excluir todas</button>
+          <button class="sel-ctrl-btn sel-ctrl-btn--ghost" id="btn-invert-sel"><i data-lucide="arrow-up-down"></i> Invertir</button>
+        </div>
+        <div class="sel-controls__right">
+          <span class="sel-summary" id="sel-summary">Cargando…</span>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="sel-filters">
+        <span class="sel-filter-label">Mostrar:</span>
+        <button class="sel-filter active" data-filter="todas">Todas</button>
+        <button class="sel-filter" data-filter="seleccionadas">Incluidas</button>
+        <button class="sel-filter" data-filter="deseleccionadas">Excluidas</button>
+        <button class="sel-filter" data-filter="entregadas">Entregadas</button>
+      </div>
+
+      <!-- Spinner de carga -->
+      <div class="sel-spinner" id="sel-spinner">
+        <div class="spinner"></div>
+        <span>Cargando rutas…</span>
+      </div>
+
+      <!-- Tablero kanban por día -->
+      <div id="sel-kanban" class="sel-kanban" style="display:none;"></div>
+
+      <!-- Estado vacío -->
+      <div class="sel-empty" id="sel-empty" style="display:none;">
+        <div class="icon"><i data-lucide="map"></i></div>
+        <p>No hay rutas que mostrar con este filtro.</p>
+      </div>
+
+      <!-- Fila de acción -->
+      <div class="sel-action-row">
+        <div class="sel-action-info" id="sel-action-info"></div>
+        <button class="btn-generar" id="btn-generar-asignacion" disabled>
+          <i data-lucide="zap"></i> Generar asignación
+        </button>
+      </div>
+
+    </div><!-- /.sel-panel__body -->
+  </div><!-- /.sel-panel -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       ZONA DE ASIGNACIÓN (se muestra tras generar)
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="zona-asignacion" style="display:none;">
+
+    <!-- Toolbar -->
+    <div class="asig-toolbar">
+      <div class="asig-toolbar-left">
+        <div class="dia-selector" id="dia-selector"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="btn-volver-sel" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Reconfigurar</button>
+        <button id="btn-config-dias" class="btn btn-secondary"><i data-lucide="settings"></i> Días</button>
+        <button id="btn-solo-guardar" class="btn btn-guardar-secundario">
+          <i data-lucide="save"></i> Solo guardar
+        </button>
+        <button id="btn-guardar-continuar" class="btn btn-success">
+          <i data-lucide="save"></i> Guardar y continuar <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicadores del día -->
+    <div class="indicadores-dia" id="indicadores-dia">
+      <div class="indicador-card">
+        <div class="label">Rutas del día</div>
+        <div class="valor" id="ind-rutas">—</div>
+        <div class="sub">programadas</div>
+      </div>
+      <div class="indicador-card">
+        <div class="label">Con vehículo</div>
+        <div class="valor" id="ind-asignadas">—</div>
+        <div class="sub">vehículo asignado</div>
+      </div>
+      <div class="indicador-card">
+        <div class="label">Peso total</div>
+        <div class="valor" id="ind-peso">—</div>
+        <div class="sub">del día (toneladas)</div>
+      </div>
+      <div class="indicador-card">
+        <div class="label">Volumen total</div>
+        <div class="valor" id="ind-volumen">—</div>
+        <div class="sub">del día (m³)</div>
+      </div>
+      <div class="indicador-card">
+        <div class="label">Hora salida</div>
+        <div class="valor" id="ind-salida">—</div>
+        <div class="sub" id="ind-limite">límite: —</div>
+      </div>
+    </div>
+
+    <!-- Banner OSRM -->
+    <div id="banner-tiempos" style="
+        display:none; align-items:center; gap:10px;
+        background:#dbeafe; border:1px solid #93c5fd; border-radius:6px;
+        padding:10px 16px; margin-bottom:16px; font-size:0.83rem; color:#1e40af;">
+      <div class="spinner" style="width:18px;height:18px;border-width:2px;border-top-color:#2563eb;"></div>
+      <span>Calculando tiempos con OpenStreetMap…</span>
+    </div>
+
+    <!-- Grid de rutas -->
+    <div id="rutas-grid" class="rutas-grid"></div>
+
+  </div><!-- /#zona-asignacion -->
+
+</div><!-- /#asignacion-container -->
+
+<!-- Modal: Configurar días -->
+<div id="modal-config-dias" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title"><i data-lucide="settings"></i> Configuración de días de operación</div>
+    <div id="config-dias-form"></div>
+    <div class="modal-footer">
+      <button id="modal-dias-cancel" class="btn btn-secondary">Cancelar</button>
+      <button id="modal-dias-save"   class="btn btn-primary">Guardar configuración</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="{{ url_for('static', filename='js/asignacion.js') }}"></script>
+{% endblock %}

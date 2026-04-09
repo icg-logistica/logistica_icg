@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Validación de Rutas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/validacion.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Validación de Rutas</h1>
+<div id="validacion-container">
+
+  <!-- Resumen global -->
+  <div class="val-resumen" id="val-resumen">
+    <div class="resumen-card total">
+      <div class="resumen-valor" id="res-total">—</div>
+      <div class="resumen-label">Total rutas</div>
+    </div>
+    <div class="resumen-card verde">
+      <div class="resumen-valor" id="res-verdes">—</div>
+      <div class="resumen-label">Cumplen todo</div>
+    </div>
+    <div class="resumen-card naranja">
+      <div class="resumen-valor" id="res-naranjas">—</div>
+      <div class="resumen-label">Cumple 1 de 2</div>
+    </div>
+    <div class="resumen-card roja">
+      <div class="resumen-valor" id="res-rojas">—</div>
+      <div class="resumen-label">No cumplen</div>
+    </div>
+    <div class="resumen-acciones">
+      <button id="btn-auto-clasificar" class="btn btn-primary"><i data-lucide="zap"></i> Auto-clasificar</button>
+      <button id="btn-solo-guardar-val" class="btn btn-guardar-secundario-val">
+        <i data-lucide="save"></i> Solo guardar
+      </button>
+      <button id="btn-guardar-continuar-val" class="btn btn-success">
+        <i data-lucide="save"></i> Guardar y continuar <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Leyenda -->
+  <div class="val-leyenda">
+    <span class="leyenda-item"><span class="leyenda-dot verde"></span> Cumple peso y horario</span>
+    <span class="leyenda-item"><span class="leyenda-dot naranja"></span> Cumple solo uno</span>
+    <span class="leyenda-item"><span class="leyenda-dot roja"></span> No cumple ninguno</span>
+    <span class="leyenda-item" style="margin-left:auto;color:#64748b;font-size:0.78rem;">
+      Arrastra las rutas entre columnas para clasificarlas
+    </span>
+  </div>
+
+  <!-- Tablero de 3 columnas (Kanban) -->
+  <div class="val-board">
+
+    <!-- Columna: Todas las rutas -->
+    <div class="val-columna" data-columna="pendientes">
+      <div class="col-header pendientes">
+        <div class="col-titulo">
+          <span class="col-icono"><i data-lucide="clipboard-list"></i></span>
+          <span>Todas las rutas</span>
+        </div>
+        <span class="col-badge" id="badge-pendientes">0</span>
+      </div>
+      <div class="col-body dropzone" id="col-pendientes" data-columna="pendientes">
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Columna: Autorizados -->
+    <div class="val-columna" data-columna="autorizados">
+      <div class="col-header autorizados">
+        <div class="col-titulo">
+          <span class="col-icono"><i data-lucide="check-circle-2"></i></span>
+          <span>Autorizados</span>
+        </div>
+        <span class="col-badge" id="badge-autorizados">0</span>
+      </div>
+      <div class="col-body dropzone" id="col-autorizados" data-columna="autorizados">
+        <div class="col-placeholder">
+          <div class="ph-icono"><i data-lucide="check-circle-2"></i></div>
+          <p>Arrastra rutas aquí para autorizarlas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna: Reorganizar -->
+    <div class="val-columna" data-columna="reorganizar">
+      <div class="col-header reorganizar">
+        <div class="col-titulo">
+          <span class="col-icono"><i data-lucide="refresh-cw"></i></span>
+          <span>Reorganizar</span>
+        </div>
+        <span class="col-badge" id="badge-reorganizar">0</span>
+      </div>
+      <div class="col-body dropzone" id="col-reorganizar" data-columna="reorganizar">
+        <div class="col-placeholder">
+          <div class="ph-icono"><i data-lucide="refresh-cw"></i></div>
+          <p>Arrastra rutas que necesiten cambios</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="{{ url_for('static', filename='js/validacion.js') }}"></script>
+{% endblock %}

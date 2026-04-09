@@ -1,0 +1,7 @@
+flask>=3.0
+flask-cors
+reportlab       # Para generación de PDFs (Sección 7)
+openpyxl        # Para extracción de Excel (Sección 1)
+python-dotenv   # Para variables de entorno
+pandas
+numpy
